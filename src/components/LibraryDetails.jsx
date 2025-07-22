@@ -1,6 +1,18 @@
 // src/components/LibraryDetails.jsx
 import "./LibraryDetails.css";
 
+// 格式化時間函數，保留日期，移除秒數
+function formatTime(dateTime) {
+  if (!dateTime) return "";
+  const date = new Date(dateTime);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${year}-${month}-${day} ${hours}:${minutes}`;
+}
+
 function LibraryDetails({ library }) {
   return (
     <div className="library-details">
@@ -42,16 +54,25 @@ function LibraryDetails({ library }) {
             </tr>
           </thead>
           <tbody>
-            {library.sessionList.map((session, index) =>
-              session.workstationGroup.map((group) => (
-                <tr key={`${index}-${group.groupId}`}>
-                  <td>{session.sessionStart}</td>
-                  <td>{session.sessionEnd}</td>
+            {library.sessionList.map((session, sessionIndex) => {
+              const rowSpan = session.workstationGroup.length; // 計算 rowSpan
+              return session.workstationGroup.map((group, groupIndex) => (
+                <tr key={`${sessionIndex}-${group.groupId}`}>
+                  {groupIndex === 0 ? (
+                    <>
+                      <td rowSpan={rowSpan} className="time-cell">
+                        {formatTime(session.sessionStart)}
+                      </td>
+                      <td rowSpan={rowSpan} className="time-cell">
+                        {formatTime(session.sessionEnd)}
+                      </td>
+                    </>
+                  ) : null}
                   <td>{group.groupName}</td>
                   <td>{group.availableWktNumber}</td>
                 </tr>
-              ))
-            )}
+              ));
+            })}
           </tbody>
         </table>
       ) : (
