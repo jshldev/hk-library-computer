@@ -1,12 +1,65 @@
-# React + Vite
+# 香港公共圖書館電腦設施查詢
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![應用程式截圖](screenshot.png)
 
-Currently, two official plugins are available:
+## 網站連結
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+訪問 [https://jshldev.github.io/hk-library-computer/](https://jshldev.github.io/hk-library-computer/) 查看線上版本！
 
-## Expanding the ESLint configuration
+## 項目概述
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+這是一個基於 React 的網頁應用程式，幫助用戶查詢香港公共圖書館的電腦設施使用情況。應用程式從香港公共圖書館的公開 API 獲取即時數據，顯示圖書館的開放狀態、地址、聯繫方式以及電腦工作站的可用時段和數量。用戶可通過區域篩選圖書館、將圖書館加入「我的最愛」，並選擇僅查看開放中的圖書館，提升使用便利性。
+
+## 功能特色
+
+- **區域篩選**：按區域（如灣仔、九龍城）篩選圖書館，快速找到附近設施。
+- **即時電腦設施資訊**：顯示每個圖書館的電腦工作站可用時段和數量，時段以合併表格顯示。
+- **我的最愛**：
+  - 點擊圖書館名稱旁的星星（★/☆）加入或移除「我的最愛」。
+  - 「我的最愛」列表顯示在區域選擇上方，方便快速訪問。
+  - 「清空我的最愛」按鈕位於「我的最愛」標題右邊，一鍵移除所有最愛圖書館。
+- **僅顯示開放中的圖書館**：勾選「選擇區域」標題右邊的「只顯示開放中的圖書館」，僅顯示 `isOpen: true` 的圖書館，預設顯示全部。
+- **響應式設計**：支援電腦和手機端，表格、星星和按鈕在窄螢幕上清晰顯示。
+- **持久化儲存**：我的最愛清單儲存於 `localStorage`，刷新頁面後保留。
+
+## 使用方法
+
+1. **查看圖書館列表**：
+
+   - 在「選擇區域」下拉選單選擇一個區域（例如「灣仔」）。
+   - 區域下方顯示該區域的圖書館列表（預設顯示全部圖書館）。
+   - 勾選「只顯示開放中的圖書館」，僅顯示當前開放的圖書館。
+
+2. **加入/移除我的最愛**：
+
+   - 在圖書館列表或詳細頁面，點擊圖書館名稱旁的星星：
+     - 灰色空心星（☆）：點擊加入我的最愛，變為黃色實心星（★）。
+     - 黃色實心星（★）：點擊從我的最愛移除，恢復為灰色空心星。
+   - 「我的最愛」列表位於頁面頂部，點擊圖書館名稱查看詳情，點擊星星移除。
+
+3. **清空我的最愛**：
+
+   - 在「我的最愛」標題右邊點擊「清空我的最愛」按鈕，清空所有已加入的圖書館。
+
+4. **查看圖書館詳情**：
+
+   - 點擊圖書館名稱，顯示詳細資訊，包括：
+     - 區域、地址、電話、電郵、開放狀態和最後更新時間。
+     - 電腦設施表格，顯示時段（格式如 `2025-07-22 18:00`）、工作站組和可用電腦數量。
+     - 同一時段的多個工作站組合併顯示，時段欄垂直置中。
+
+5. **手機端使用**：
+   - 應用程式自動適應窄螢幕，列表顯示為單列，星星和按鈕縮小，表格保持清晰。
+
+## 技術亮點
+
+- **前端框架**：使用 React 構建，組件化設計提升維護性。
+- **API 數據**：從香港公共圖書館公開 API 獲取即時數據，確保資訊準確。
+
+## 聯繫
+
+如有建議或問題，歡迎在 GitHub 提交 Issue 或聯繫作者！
+
+## 許可證
+
+本項目採用 [MIT 許可證](LICENSE).
