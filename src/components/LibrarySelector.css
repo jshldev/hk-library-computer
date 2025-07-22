@@ -1,0 +1,56 @@
+/* src/components/LibrarySelector.css */
+.library-selector {
+  margin: 20px 0;
+}
+
+label {
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+select {
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  width: 100%;
+  max-width: 300px;
+}
+
+.library-list {
+  margin-top: 20px;
+}
+
+.library-list h3 {
+  color: #333;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.library-item {
+  padding: 10px;
+  background: #f5f5f5;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.library-item:hover {
+  background: #e0e0e0;
+}
+
+@media (max-width: 600px) {
+  select {
+    width: 100%;
+  }
+
+  ul {
+    grid-template-columns: 1fr;
+  }
+}
