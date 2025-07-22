@@ -3,6 +3,42 @@
   margin: 20px 0;
 }
 
+.language-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.language-label {
+  font-weight: bold;
+}
+
+.language-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.language-button {
+  padding: 6px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.language-button.active {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.language-button:hover:not(.active) {
+  background: #f0f0f0;
+}
+
 .favorites-header {
   display: flex;
   align-items: center;
@@ -107,6 +143,19 @@ ul {
 }
 
 @media (max-width: 600px) {
+  .language-selector {
+    gap: 8px;
+  }
+
+  .language-buttons {
+    gap: 6px;
+  }
+
+  .language-button {
+    padding: 5px 10px;
+    font-size: 13px;
+  }
+
   .favorites-header,
   .district-header {
     gap: 8px;

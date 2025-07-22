@@ -1,7 +1,6 @@
 // src/components/LibraryDetails.jsx
 import "./LibraryDetails.css";
 
-// SVG 星星圖標
 const FilledStar = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="#ffd700">
     <path d="M12 .587l3.668 7.431 8.332 1.209-6.001 5.853 1.415 8.25L12 18.897l-7.414 3.897 1.415-8.25-6.001-5.853 8.332-1.209z" />
@@ -32,7 +31,7 @@ function formatTime(dateTime) {
   return `${year}-${month}-${day} ${hours}:${minutes}`;
 }
 
-function LibraryDetails({ library, favorites, toggleFavorite }) {
+function LibraryDetails({ library, favorites, toggleFavorite, translations }) {
   return (
     <div className="library-details">
       <h2>
@@ -42,8 +41,8 @@ function LibraryDetails({ library, favorites, toggleFavorite }) {
           onClick={() => toggleFavorite(library.libraryCode)}
           title={
             favorites.includes(library.libraryCode)
-              ? "從我的最愛移除"
-              : "加入我的最愛"
+              ? translations.removeFavorite
+              : translations.addFavorite
           }
         >
           {favorites.includes(library.libraryCode) ? (
@@ -54,39 +53,41 @@ function LibraryDetails({ library, favorites, toggleFavorite }) {
         </span>
       </h2>
       <p>
-        <strong>區域：</strong>
+        <strong>{translations.libraryDetails.district}：</strong>
         {library.district}
       </p>
       <p>
-        <strong>地址：</strong>
+        <strong>{translations.libraryDetails.address}：</strong>
         {library.address}
       </p>
       <p>
-        <strong>電話：</strong>
+        <strong>{translations.libraryDetails.telephone}：</strong>
         {library.telephone}
       </p>
       <p>
-        <strong>電郵：</strong>
+        <strong>{translations.libraryDetails.email}：</strong>
         {library.email}
       </p>
       <p>
-        <strong>開放狀況：</strong>
-        {library.isOpen ? "開放中" : "已關閉"}
+        <strong>{translations.libraryDetails.isOpen}：</strong>
+        {library.isOpen
+          ? translations.libraryDetails.isOpenTrue
+          : translations.libraryDetails.isOpenFalse}
       </p>
       <p>
-        <strong>最後更新時間：</strong>
+        <strong>{translations.libraryDetails.lastUpdate}：</strong>
         {library.lastUpdateDate}
       </p>
 
-      <h3>電腦設施使用情況</h3>
+      <h3>{translations.libraryDetails.computerFacilities}</h3>
       {library.sessionList.length > 0 ? (
         <table>
           <thead>
             <tr>
-              <th>時段開始</th>
-              <th>時段結束</th>
-              <th>工作站組</th>
-              <th>可用電腦數量</th>
+              <th>{translations.libraryDetails.sessionStart}</th>
+              <th>{translations.libraryDetails.sessionEnd}</th>
+              <th>{translations.libraryDetails.workstationGroup}</th>
+              <th>{translations.libraryDetails.availableComputers}</th>
             </tr>
           </thead>
           <tbody>
@@ -112,7 +113,7 @@ function LibraryDetails({ library, favorites, toggleFavorite }) {
           </tbody>
         </table>
       ) : (
-        <p>當前無可用電腦設施時段。</p>
+        <p>{translations.libraryDetails.noFacilities}</p>
       )}
     </div>
   );
