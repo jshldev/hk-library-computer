@@ -11,6 +11,11 @@ function App() {
   const [selectedLibrary, setSelectedLibrary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [favorites, setFavorites] = useState(() => {
+    const saved = localStorage.getItem("favorites");
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [showOpenOnly, setShowOpenOnly] = useState(false); // 新增狀態，預設不勾選
 
   useEffect(() => {
     const fetchLibraries = async () => {
@@ -23,13 +28,18 @@ function App() {
           "response.data type:",
           Array.isArray(response.data) ? "Array" : typeof response.data
         );
-        // 假設圖書館資料在 response.data
-        const data = Array.isArray(response.data) ? response.data : [];
+        const data = Array.isArray(response.data)
+          ? response.data
+          : response.data.data || [];
         console.log("Parsed Libraries:", data);
         setLibraries(data);
         setLoading(false);
       } catch (err) {
-        console.error("API Error:", err);
+        console.error("API Error Details:", {
+          message: err.message,
+          response: err.response ? err.response.data : null,
+          status: err.response ? err.response.status : null,
+        });
         setError("無法加載圖書館資料，請稍後再試。");
         setLoading(false);
       }
@@ -37,13 +47,17 @@ function App() {
     fetchLibraries();
   }, []);
 
-  console.log(
-    "Libraries before districts:",
-    libraries.map((lib) => ({
-      libraryCode: lib.libraryCode,
-      district: lib.district,
-    }))
-  );
+  useEffect(() => {
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+  }, [favorites]);
+
+  const toggleFavorite = (libraryCode) => {
+    setFavorites((prev) =>
+      prev.includes(libraryCode)
+        ? prev.filter((code) => code !== libraryCode)
+        : [...prev, libraryCode]
+    );
+  };
 
   const districts =
     libraries.length > 0
@@ -58,7 +72,6 @@ function App() {
           ),
         ].sort()
       : [];
-  console.log("Computed Districts:", districts);
 
   const handleDistrictChange = (district) => {
     setSelectedDistrict(district);
@@ -69,13 +82,19 @@ function App() {
     setSelectedLibrary(library);
   };
 
+  // 過濾圖書館，根據 showOpenOnly 決定是否僅顯示開放中的圖書館
   const filteredLibraries = libraries.filter(
-    (lib) => lib.district === selectedDistrict
+    (lib) => lib.district === selectedDistrict && (!showOpenOnly || lib.isOpen)
+  );
+
+  const favoriteLibraries = libraries.filter(
+    (lib) =>
+      favorites.includes(lib.libraryCode) && (!showOpenOnly || lib.isOpen)
   );
 
   return (
     <div className="app">
-      <h1>香港公共圖書館電腦設施可供使用情況查詢</h1>
+      <h1>香港公共圖書館電腦設施查詢</h1>
       {loading && <p>正在加載資料...</p>}
       {error && (
         <div>
@@ -93,17 +112,26 @@ function App() {
       )}
       {!loading && !error && (
         <>
-          {districts.length === 0 && (
-            <p>無可用區域資料，請稍後再試或檢查 API 資料。</p>
-          )}
           <LibrarySelector
             districts={districts}
             selectedDistrict={selectedDistrict}
             onDistrictChange={handleDistrictChange}
             libraries={filteredLibraries}
+            favoriteLibraries={favoriteLibraries}
             onLibrarySelect={handleLibrarySelect}
+            favorites={favorites}
+            toggleFavorite={toggleFavorite}
+            setFavorites={setFavorites}
+            showOpenOnly={showOpenOnly}
+            setShowOpenOnly={setShowOpenOnly}
           />
-          {selectedLibrary && <LibraryDetails library={selectedLibrary} />}
+          {selectedLibrary && (
+            <LibraryDetails
+              library={selectedLibrary}
+              favorites={favorites}
+              toggleFavorite={toggleFavorite}
+            />
+          )}
         </>
       )}
     </div>

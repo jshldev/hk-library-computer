@@ -1,7 +1,26 @@
 // src/components/LibraryDetails.jsx
 import "./LibraryDetails.css";
 
-// 格式化時間函數，保留日期，移除秒數
+// SVG 星星圖標
+const FilledStar = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="#ffd700">
+    <path d="M12 .587l3.668 7.431 8.332 1.209-6.001 5.853 1.415 8.25L12 18.897l-7.414 3.897 1.415-8.25-6.001-5.853 8.332-1.209z" />
+  </svg>
+);
+
+const EmptyStar = () => (
+  <svg
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="#ccc"
+    strokeWidth="2"
+  >
+    <path d="M12 .587l3.668 7.431 8.332 1.209-6.001 5.853 1.415 8.25L12 18.897l-7.414 3.897 1.415-8.25-6.001-5.853 8.332-1.209z" />
+  </svg>
+);
+
 function formatTime(dateTime) {
   if (!dateTime) return "";
   const date = new Date(dateTime);
@@ -13,10 +32,27 @@ function formatTime(dateTime) {
   return `${year}-${month}-${day} ${hours}:${minutes}`;
 }
 
-function LibraryDetails({ library }) {
+function LibraryDetails({ library, favorites, toggleFavorite }) {
   return (
     <div className="library-details">
-      <h2>{library.libraryDisplayName}</h2>
+      <h2>
+        {library.libraryDisplayName}
+        <span
+          className="star"
+          onClick={() => toggleFavorite(library.libraryCode)}
+          title={
+            favorites.includes(library.libraryCode)
+              ? "從我的最愛移除"
+              : "加入我的最愛"
+          }
+        >
+          {favorites.includes(library.libraryCode) ? (
+            <FilledStar />
+          ) : (
+            <EmptyStar />
+          )}
+        </span>
+      </h2>
       <p>
         <strong>區域：</strong>
         {library.district}
@@ -55,7 +91,7 @@ function LibraryDetails({ library }) {
           </thead>
           <tbody>
             {library.sessionList.map((session, sessionIndex) => {
-              const rowSpan = session.workstationGroup.length; // 計算 rowSpan
+              const rowSpan = session.workstationGroup.length;
               return session.workstationGroup.map((group, groupIndex) => (
                 <tr key={`${sessionIndex}-${group.groupId}`}>
                   {groupIndex === 0 ? (

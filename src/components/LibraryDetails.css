@@ -10,6 +10,8 @@
 h2 {
   color: #333;
   margin-bottom: 10px;
+  display: flex;
+  align-items: center;
 }
 
 p {
@@ -24,10 +26,10 @@ table {
 
 th,
 td {
-  padding: 12px; /* 增加內邊距，提升舒適度 */
+  padding: 12px;
   border: 1px solid #ddd;
   text-align: left;
-  word-break: break-word; /* 防止長文字溢出 */
+  word-break: break-word;
 }
 
 th {
@@ -36,33 +38,38 @@ th {
 }
 
 .time-cell {
-  vertical-align: middle; /* 垂直置中，適用於 rowSpan 的時段欄位 */
+  vertical-align: middle;
 }
 
-/* 欄寬比例：縮減時段欄，擴大工作站組 */
 th:nth-child(1),
 td:nth-child(1) {
-  width: 20%; /* 時段開始，縮減 */
+  width: 20%;
 }
 
 th:nth-child(2),
 td:nth-child(2) {
-  width: 20%; /* 時段結束，縮減 */
+  width: 20%;
 }
 
 th:nth-child(3),
 td:nth-child(3) {
-  width: 45%; /* 工作站組，擴大以容納長文字 */
+  width: 45%;
 }
 
 th:nth-child(4),
 td:nth-child(4) {
-  width: 15%; /* 可用電腦數量，適度增加 */
+  width: 15%;
 }
 
-/* 交替行背景色，提升可讀性 */
 tr:nth-child(even) {
   background: #fafafa;
+}
+
+.star {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
 }
 
 @media (max-width: 600px) {
@@ -71,15 +78,14 @@ tr:nth-child(even) {
   }
 
   table {
-    font-size: 13px; /* 手機端縮小字體 */
+    font-size: 13px;
   }
 
   th,
   td {
-    padding: 8px; /* 手機端縮小內邊距 */
+    padding: 8px;
   }
 
-  /* 手機端欄寬調整，適應窄螢幕 */
   th:nth-child(1),
   td:nth-child(1) {
     width: 22%;
@@ -102,5 +108,10 @@ tr:nth-child(even) {
 
   .time-cell {
     vertical-align: middle;
+  }
+
+  .star svg {
+    width: 16px;
+    height: 16px;
   }
 }
