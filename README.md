@@ -1,6 +1,6 @@
 # 香港公共圖書館電腦設施查詢
 
-![應用程式截圖](screenshot.png)
+<img src="public/hk-library-computer-screenshot.png" alt="應用程式截圖" width="90%"/>
 
 ## 網站連結
 
