@@ -7,6 +7,21 @@ import translations from "./translations";
 import "./App.css";
 
 function App() {
+  // 解析 URL 參數
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialLibraryCode = urlParams.get("libraryCode") || "";
+  const initialLanguage = ["zh-HK", "zh-CN", "en-US"].includes(
+    urlParams.get("lang")
+  )
+    ? urlParams.get("lang")
+    : localStorage.getItem("language") || "zh-HK";
+
+  console.log("URL Params:", {
+    libraryCode: initialLibraryCode,
+    lang: initialLanguage,
+    search: window.location.search,
+  });
+
   const [libraries, setLibraries] = useState([]);
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedLibrary, setSelectedLibrary] = useState(null);
@@ -16,29 +31,28 @@ function App() {
     const saved = localStorage.getItem("favorites");
     return saved ? JSON.parse(saved) : [];
   });
-  const [language, setLanguage] = useState(() => {
-    return localStorage.getItem("language") || "zh-HK";
-  });
+  const [language, setLanguage] = useState(initialLanguage);
   const [showOpenOnly, setShowOpenOnly] = useState(false);
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
 
-  // 儲存區名對應表，方便語言切換時查找
+  // 區名對應表（需補充完整）
   const districtMapping = {
     "zh-HK": {
       "Sha Tin District": "沙田區",
       "Tai Po District": "大埔區",
-      // 添加其他區名對應
+      // 補充其他區
     },
     "zh-CN": {
       "Sha Tin District": "沙田区",
       "Tai Po District": "大埔区",
-      // 添加其他區名對應
+      // 補充其他區
     },
     "en-US": {
       沙田區: "Sha Tin District",
       大埔區: "Tai Po District",
       沙田区: "Sha Tin District",
       大埔区: "Tai Po District",
-      // 添加其他區名對應
+      // 補充其他區
     },
   };
 
@@ -46,6 +60,7 @@ function App() {
     const fetchLibraries = async () => {
       try {
         const apiUrl = `https://sls.hkpl.gov.hk/api/cfm-admin-service/open-api/library/selectLibraryPageInfoForPSI?language=${language}&sizePerPage=9999`;
+        console.log("Fetching API:", apiUrl);
         const response = await axios.get(apiUrl);
         console.log("API Response:", response.data);
         console.log(
@@ -71,34 +86,63 @@ function App() {
     fetchLibraries();
   }, [language]);
 
+  // 處理初始 URL 參數的 libraryCode
   useEffect(() => {
-    if (libraries.length > 0 && (selectedLibrary || selectedDistrict)) {
-      // 如果有選擇的圖書館，優先更新 selectedLibrary 和 selectedDistrict
-      if (selectedLibrary) {
-        const updatedLibrary = libraries.find(
-          (lib) => lib.libraryCode === selectedLibrary.libraryCode
-        );
-        if (updatedLibrary) {
-          setSelectedLibrary(updatedLibrary);
-          setSelectedDistrict(updatedLibrary.district);
-        } else {
-          // 如果圖書館不存在（例如被過濾），清空選擇
-          setSelectedLibrary(null);
-          setSelectedDistrict("");
-        }
-      } else if (selectedDistrict) {
-        // 如果只有 selectedDistrict，嘗試查找新語言的對應區名
-        const newDistrict =
-          libraries.find((lib) => {
-            const mapping = districtMapping[language] || {};
-            const mappedDistrict =
-              mapping[selectedDistrict] || selectedDistrict;
-            return lib.district === mappedDistrict;
-          })?.district || "";
-        setSelectedDistrict(newDistrict);
+    if (libraries.length > 0 && !initialLoadDone && initialLibraryCode) {
+      console.log(
+        "Libraries loaded:",
+        libraries.map((lib) => ({
+          libraryCode: lib.libraryCode,
+          libraryDisplayName: lib.libraryDisplayName,
+          district: lib.district,
+        }))
+      );
+      const library = libraries.find(
+        (lib) => lib.libraryCode === initialLibraryCode
+      );
+      console.log(
+        "Looking for libraryCode:",
+        initialLibraryCode,
+        "Found:",
+        library
+      );
+      if (library) {
+        setSelectedLibrary(library);
+        setSelectedDistrict(library.district);
+      } else {
+        console.warn("Library not found for libraryCode:", initialLibraryCode);
       }
+      setInitialLoadDone(true);
     }
-  }, [libraries, language, selectedLibrary, selectedDistrict]);
+  }, [libraries, initialLibraryCode, initialLoadDone]);
+
+  // 更新已選擇的圖書館和區域（語言切換時）
+  useEffect(() => {
+    if (libraries.length > 0 && initialLoadDone && selectedLibrary) {
+      const updatedLibrary = libraries.find(
+        (lib) => lib.libraryCode === selectedLibrary.libraryCode
+      );
+      console.log("Updating selectedLibrary:", updatedLibrary);
+      if (updatedLibrary) {
+        setSelectedLibrary(updatedLibrary);
+        setSelectedDistrict(updatedLibrary.district);
+      } else {
+        setSelectedLibrary(null);
+        setSelectedDistrict("");
+      }
+    } else if (libraries.length > 0 && selectedDistrict) {
+      const newDistrict =
+        libraries.find((lib) => {
+          const mapping = districtMapping[language] || {};
+          const mappedDistrict = mapping[selectedDistrict] || selectedDistrict;
+          return lib.district === mappedDistrict;
+        })?.district || "";
+      console.log("Updating selectedDistrict:", newDistrict);
+      setSelectedDistrict(newDistrict);
+    }
+    console.log("Selected Library:", selectedLibrary);
+    console.log("Selected District:", selectedDistrict);
+  }, [libraries, language, selectedLibrary, selectedDistrict, initialLoadDone]);
 
   useEffect(() => {
     localStorage.setItem("favorites", JSON.stringify(favorites));
@@ -130,11 +174,42 @@ function App() {
   const handleDistrictChange = (district) => {
     setSelectedDistrict(district);
     setSelectedLibrary(null);
+    // 更新 URL，移除 libraryCode
+    const params = new URLSearchParams();
+    params.set("lang", language);
+    window.history.replaceState(
+      {},
+      "",
+      `/hk-library-computer?${params.toString()}`
+    );
   };
 
   const handleLibrarySelect = (library) => {
     setSelectedLibrary(library);
-    setSelectedDistrict(library.district);
+    // 更新 URL
+    const params = new URLSearchParams();
+    params.set("libraryCode", library.libraryCode);
+    params.set("lang", language);
+    window.history.replaceState(
+      {},
+      "",
+      `/hk-library-computer?${params.toString()}`
+    );
+  };
+
+  const handleLanguageChange = (newLanguage) => {
+    setLanguage(newLanguage);
+    // 更新 URL
+    const params = new URLSearchParams();
+    if (selectedLibrary) {
+      params.set("libraryCode", selectedLibrary.libraryCode);
+    }
+    params.set("lang", newLanguage);
+    window.history.replaceState(
+      {},
+      "",
+      `/hk-library-computer?${params.toString()}`
+    );
   };
 
   const filteredLibraries = libraries.filter(
@@ -179,7 +254,7 @@ function App() {
             showOpenOnly={showOpenOnly}
             setShowOpenOnly={setShowOpenOnly}
             language={language}
-            setLanguage={setLanguage}
+            setLanguage={handleLanguageChange}
             translations={translations[language]}
           />
           {selectedLibrary && (
